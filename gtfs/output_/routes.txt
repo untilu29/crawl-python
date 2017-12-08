@@ -1,0 +1,17 @@
+route_id,agency_id,route_short_name,route_long_name,route_type,route_color,competent_authority
+c8a7e9a21b8c53d7770223de2c6a2f92,82,ELR1,Tallinn - Tartu (ekspress),2,969696,Maanteeamet
+f13beb56aacef1aa8d47f30fe2542490,82,ELR22,Tallinn - Narva,2,969696,Maanteeamet
+ba5c756aa70db73ae0205953e17071fe,82,ELR23,Tallinn - Rakvere,2,969696,Maanteeamet
+0feff6bb8654c39c7ecb0cdb0a73c3a8,82,ELR26,Tallinn - Rapla,2,969696,Maanteeamet
+832a6717591d257a3f1e5a6d45fb3979,82,ELR3,Tallinn - Türi,2,969696,Maanteeamet
+f5c83750b921bd3a1e40d1f9772d8de7,82,ELR30,Tallinn - Pärnu,2,969696,Maanteeamet
+f3781b2b75907a7b99cfe1518ee5a706,82,ELR32,Jõgeva - Tartu,2,969696,Maanteeamet
+877cd6ad87097769c9ee5dbc1e713a9c,82,ELR33,Tartu - Valga,2,969696,Maanteeamet
+9717380dfa2fb6c0a3b7affa000d254b,82,ELR38,Tartu - Koidula,2,969696,Maanteeamet
+08d72e3a86de91b7171248fdc8586bb0,82,ELR4,Tallinn - Viljandi (kiirrong),2,969696,Maanteeamet
+95c5fa8689299d61de3802efc47c96ce,82,ELR40,Tallinn - Aegviidu,2,969696,Maanteeamet
+957785d7732ce87c3eec9b65045aa572,82,ELR5,Tallinn - Paldiski,2,969696,Maanteeamet
+b71678df5f62226afb34899f2ea092c5,82,ELR51,Tallinn - Riisipere,2,969696,Maanteeamet
+4223e2abb45c3505a771a60d74a74222,82,ELR52,Tallinn - Kloogaranna,2,969696,Maanteeamet
+7a58367fba325459a05d5a5c7aefeaf3,82,ELR53,Tallinn - Keila,2,969696,Maanteeamet
+55f11820da541eef9b45c9862aec4075,82,ELR7,Tallinn - Pääsküla,2,969696,Maanteeamet
