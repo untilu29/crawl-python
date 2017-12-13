@@ -60,8 +60,9 @@ elron_fareRules = fareRules[
     fareRules['route_id'].isin(elron_route.index) & fareRules['origin_id'].isin(elron_stops['zone_id']) & fareRules[
         'destination_id'].isin(elron_stops['zone_id'])]
 
-elron_stops['location_type'] = ''
-elron_stops['parent_station'] = ''
+elron_stops.loc[:,'location_type'] = ''
+elron_stops.loc[:,'parent_station'] = ''
+elron_stops.loc[:,'count'] = np.nan
 
 elron_stops_parent_stop = elron_stops.fillna('').groupby(['stop_name'], as_index=False).agg({
     "stop_id": lambda x: '-'.join(x),
@@ -77,15 +78,19 @@ elron_stops_parent_stop = elron_stops.fillna('').groupby(['stop_name'], as_index
     "lest_y": "mean",
     'location_type': lambda x: '1',
     'parent_station': lambda x: '',
-})
+    'count': 'count'
+}).replace("-","")
 
 for index, stop in elron_stops.iterrows():
     for idx, stop_parent in elron_stops_parent_stop.iterrows():
-        if stop['stop_id'] in stop_parent['stop_id']:
+        if stop['stop_name'] == stop_parent['stop_name'] and stop_parent['count']>1:
             elron_stops.set_value(index, 'parent_station', stop_parent['stop_id'])
 
-result = elron_stops.append(elron_stops_parent_stop)
+elron_stops = pd.concat([elron_stops,elron_stops_parent_stop])[['stop_id','stop_code','stop_name','stop_lat','stop_lon',
+                                                                'zone_id','alias','stop_area','stop_desc','lest_x',
+                                                                'lest_y','zone_name','location_type','parent_station']]
 
+elron_stops=elron_stops.drop_duplicates(subset=['stop_id'])
 elron_agency.to_csv(AGENCY, encoding='utf-8')
 elron_feedInfo.to_csv(FEED_INFO, encoding='utf-8', index=False)
 elron_fareAttributes.to_csv(FARE_ATT, encoding='utf-8', index=False)
@@ -96,7 +101,7 @@ elron_calendar.to_csv(CALENDAR, encoding='utf-8', index=False)
 elron_calendarDates.to_csv(CALENDAR_DATE, encoding='utf-8', index=False)
 elron_shape.to_csv(SHAPE, encoding='utf-8', index=False)
 elron_stopTimes.to_csv(STOP_TIME, encoding='utf-8', index=False)
-result.to_csv(STOP, encoding='utf-8', index=False)
+elron_stops.to_csv(STOP, encoding='utf-8', index=False)
 
 with zf.ZipFile(output_folder + '/estonia.zip', 'w') as myzip:
     myzip.write(AGENCY, basename(AGENCY))
