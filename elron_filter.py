@@ -2,6 +2,7 @@ import pandas as pd
 import zipfile as zf
 import os, glob
 from os.path import basename
+import numpy as np
 
 # Input file here
 zipInput = zf.ZipFile("gtfs.zip", "r")
@@ -46,16 +47,44 @@ elron_calendarDates = calendarDates[calendarDates['service_id'].isin(elron_calen
 shapes = pd.read_csv(zipInput.open("shapes.txt"), dtype={'shape_id': str, 'shape_pt_lon': str, 'shape_pt_lat': str})
 elron_shape = shapes[shapes['shape_id'].isin(elron_trip['shape_id'])]
 
-stopTimes = pd.read_csv(zipInput.open("stop_times.txt"))
+stopTimes = pd.read_csv(zipInput.open("stop_times.txt"), dtype={'stop_id': str})
 elron_stopTimes = stopTimes[stopTimes['trip_id'].isin(elron_trip.index)]
 
-stops = pd.read_csv(zipInput.open("stops.txt"), dtype={'stop_lat': str, 'stop_lon': str})
+stops = pd.read_csv(zipInput.open("stops.txt"),
+                    dtype={'stop_lat': float, 'stop_lon': float, 'stop_id': str, 'zone_id': str, 'alias': str,
+                           'lest_x': float, 'lest_y': float})
 elron_stops = stops[stops['stop_id'].isin(elron_stopTimes['stop_id'])]
 
 fareRules = pd.read_csv(zipInput.open("fare_rules.txt"))
 elron_fareRules = fareRules[
     fareRules['route_id'].isin(elron_route.index) & fareRules['origin_id'].isin(elron_stops['zone_id']) & fareRules[
         'destination_id'].isin(elron_stops['zone_id'])]
+
+elron_stops['location_type'] = ''
+elron_stops['parent_station'] = ''
+
+elron_stops_parent_stop = elron_stops.fillna('').groupby(['stop_name'], as_index=False).agg({
+    "stop_id": lambda x: '-'.join(x),
+    "stop_code": lambda x: '-'.join(x),
+    "zone_id": lambda x: '-'.join(x),
+    "zone_name": lambda x: '-'.join(x),
+    "alias": lambda x: '-'.join(x),
+    "stop_area": lambda x: '-'.join(x),
+    "stop_desc": lambda x: '-'.join(x),
+    "stop_lat": "mean",
+    "stop_lon": "mean",
+    "lest_x": "mean",
+    "lest_y": "mean",
+    'location_type': lambda x: '1',
+    'parent_station': lambda x: '',
+})
+
+for index, stop in elron_stops.iterrows():
+    for idx, stop_parent in elron_stops_parent_stop.iterrows():
+        if stop['stop_id'] in stop_parent['stop_id']:
+            elron_stops.set_value(index, 'parent_station', stop_parent['stop_id'])
+
+result = elron_stops.append(elron_stops_parent_stop)
 
 elron_agency.to_csv(AGENCY, encoding='utf-8')
 elron_feedInfo.to_csv(FEED_INFO, encoding='utf-8', index=False)
@@ -67,7 +96,7 @@ elron_calendar.to_csv(CALENDAR, encoding='utf-8', index=False)
 elron_calendarDates.to_csv(CALENDAR_DATE, encoding='utf-8', index=False)
 elron_shape.to_csv(SHAPE, encoding='utf-8', index=False)
 elron_stopTimes.to_csv(STOP_TIME, encoding='utf-8', index=False)
-elron_stops.to_csv(STOP, encoding='utf-8', index=False)
+result.to_csv(STOP, encoding='utf-8', index=False)
 
 with zf.ZipFile(output_folder + '/estonia.zip', 'w') as myzip:
     myzip.write(AGENCY, basename(AGENCY))
