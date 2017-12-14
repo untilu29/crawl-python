@@ -60,9 +60,9 @@ elron_fareRules = fareRules[
     fareRules['route_id'].isin(elron_route.index) & fareRules['origin_id'].isin(elron_stops['zone_id']) & fareRules[
         'destination_id'].isin(elron_stops['zone_id'])]
 
-elron_stops.loc[:,'location_type'] = ''
-elron_stops.loc[:,'parent_station'] = ''
-elron_stops.loc[:,'count'] = np.nan
+elron_stops.loc[:, 'location_type'] = ''
+elron_stops.loc[:, 'parent_station'] = ''
+elron_stops.loc[:, 'count'] = np.nan
 
 elron_stops_parent_stop = elron_stops.fillna('').groupby(['stop_name'], as_index=False).agg({
     "stop_id": lambda x: '-'.join(x),
@@ -79,18 +79,19 @@ elron_stops_parent_stop = elron_stops.fillna('').groupby(['stop_name'], as_index
     'location_type': lambda x: '1',
     'parent_station': lambda x: '',
     'count': 'count'
-}).replace("-","")
+}).replace("-", "")
 
 for index, stop in elron_stops.iterrows():
     for idx, stop_parent in elron_stops_parent_stop.iterrows():
-        if stop['stop_name'] == stop_parent['stop_name'] and stop_parent['count']>1:
+        if stop['stop_name'] == stop_parent['stop_name'] and stop_parent['count'] > 1:
             elron_stops.set_value(index, 'parent_station', stop_parent['stop_id'])
 
-elron_stops = pd.concat([elron_stops,elron_stops_parent_stop])[['stop_id','stop_code','stop_name','stop_lat','stop_lon',
-                                                                'zone_id','alias','stop_area','stop_desc','lest_x',
-                                                                'lest_y','zone_name','location_type','parent_station']]
+elron_stops = pd.concat([elron_stops, elron_stops_parent_stop])[
+    ['stop_id', 'stop_code', 'stop_name', 'stop_lat', 'stop_lon',
+     'zone_id', 'alias', 'stop_area', 'stop_desc', 'lest_x',
+     'lest_y', 'zone_name', 'location_type', 'parent_station']]
 
-elron_stops=elron_stops.drop_duplicates(subset=['stop_id'])
+elron_stops = elron_stops.drop_duplicates(subset=['stop_id'])
 elron_agency.to_csv(AGENCY, encoding='utf-8')
 elron_feedInfo.to_csv(FEED_INFO, encoding='utf-8', index=False)
 elron_fareAttributes.to_csv(FARE_ATT, encoding='utf-8', index=False)
